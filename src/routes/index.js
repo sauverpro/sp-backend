@@ -1,0 +1,35 @@
+import express from "express";
+import managerRouter from "./managerAuth.routes";
+import stationRouter from "./stations.routes";
+import tariffRouter from "./tariff.routes";
+import userRouter from "./users.routes";
+import stockRouter from "./stock.routes";
+import cartRouter from "./cart.routes";
+import productRouter from "./product.routes";
+import addOnRouter from "./addOns.routes";
+import adminStockRouter from "./adminStock.routes";
+import orderRouter from "./order.routes";
+import extOrderRouter from "./extOrders.routes";
+import stationOrderRouter from "./stationOrders.routes";
+import driverRouter from "./drivers.routes";
+import paymentRoute from "./payment.routes";
+import deliveryfeeRouter from "./deliveryAm.routes";
+const mainRouter = express.Router();
+
+mainRouter.use("/users", userRouter);
+mainRouter.use("/auth/managers", managerRouter);
+mainRouter.use("/stations", stationRouter);
+mainRouter.use("/product", productRouter);
+mainRouter.use("/tariff", tariffRouter);
+mainRouter.use("/stock", stockRouter);
+mainRouter.use("/cart", cartRouter);
+mainRouter.use("/adminStock", adminStockRouter);
+mainRouter.use("/addons", addOnRouter);
+mainRouter.use("/order", orderRouter);
+mainRouter.use("/driver/order", driverRouter);
+mainRouter.use("/extOrder", extOrderRouter);
+mainRouter.use("/stOrder", stationOrderRouter);
+mainRouter.use("/payment", paymentRoute);
+mainRouter.use("/deliveryfee", deliveryfeeRouter);
+
+export default mainRouter;
