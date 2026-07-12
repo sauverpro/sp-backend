@@ -1,12 +1,28 @@
 import { customerOrderModel } from "../../models/customer.order.model";
 
 const PaypackJs = require("paypack-js").default;
-const paypack = PaypackJs.config({
-  client_id: process.env.CLIENT_ID,
-  client_secret: process.env.CLIENT_SECRETE,
-});
+const paypackClientId = process.env.CLIENT_ID || process.env.PAYPACK_CLIENT_ID;
+const paypackClientSecret =
+  process.env.CLIENT_SECRETE ||
+  process.env.CLIENT_SECRET ||
+  process.env.PAYPACK_CLIENT_SECRET;
+
+const paypack =
+  paypackClientId && paypackClientSecret
+    ? PaypackJs.config({
+        client_id: paypackClientId,
+        client_secret: paypackClientSecret,
+      })
+    : null;
 
 export const payment = async (req, res) => {
+  if (!paypack) {
+    return res.status(503).json({
+      message:
+        "Payment service is not configured. Set CLIENT_ID/CLIENT_SECRETE or PAYPACK_CLIENT_ID/PAYPACK_CLIENT_SECRET.",
+    });
+  }
+
   let data = req.body;
   const order = await customerOrderModel.findById(data.orderId);
   if (!order) {
@@ -42,6 +58,13 @@ export const payment = async (req, res) => {
     });
 };
 export const cashout = (req, res) => {
+  if (!paypack) {
+    return res.status(503).json({
+      message:
+        "Payment service is not configured. Set CLIENT_ID/CLIENT_SECRETE or PAYPACK_CLIENT_ID/PAYPACK_CLIENT_SECRET.",
+    });
+  }
+
   let datas = req.body;
   paypack
     .cashout({
@@ -59,6 +82,13 @@ export const cashout = (req, res) => {
     });
 };
 export const transaction = (req, res) => {
+  if (!paypack) {
+    return res.status(503).json({
+      message:
+        "Payment service is not configured. Set CLIENT_ID/CLIENT_SECRETE or PAYPACK_CLIENT_ID/PAYPACK_CLIENT_SECRET.",
+    });
+  }
+
   paypack
     .transactions({ offset: 0, limit: 100 })
     .then((response) => {

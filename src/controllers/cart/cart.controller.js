@@ -2,14 +2,30 @@ import { cartModel } from "../../models";
 import { customerOrderModel } from "../../models/customer.order.model";
 
 const PaypackJs = require("paypack-js").default;
-const paypack = PaypackJs.config({
-  client_id: process.env.CLIENT_ID,
-  client_secret: process.env.CLIENT_SECRETE,
-});
+const paypackClientId = process.env.CLIENT_ID || process.env.PAYPACK_CLIENT_ID;
+const paypackClientSecret =
+  process.env.CLIENT_SECRETE ||
+  process.env.CLIENT_SECRET ||
+  process.env.PAYPACK_CLIENT_SECRET;
+
+const paypack =
+  paypackClientId && paypackClientSecret
+    ? PaypackJs.config({
+        client_id: paypackClientId,
+        client_secret: paypackClientSecret,
+      })
+    : null;
 
 // Create or update an item in the user's cart
 export const addCartAndOrder = async (req, res) => {
   try {
+    if (!paypack) {
+      return res.status(503).json({
+        message:
+          "Payment service is not configured. Set CLIENT_ID/CLIENT_SECRETE or PAYPACK_CLIENT_ID/PAYPACK_CLIENT_SECRET.",
+      });
+    }
+
     const UserId = req.userId;
     // Extract data from the request body
     const {
